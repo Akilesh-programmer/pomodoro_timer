@@ -11,17 +11,36 @@ SHORT_BREAK_MIN = 5
 LONG_BREAK_MIN = 20
 reps = 0
 # ---------------------------- TIMER RESET ------------------------------- # 
-
+def reset():
+    global reps
+    reps = 0
+    tick_labels.config(text="")
+    start_timer()
 # ---------------------------- TIMER MECHANISM ------------------------------- # 
 def start_timer():
     global reps
     reps += 1
     if reps % 8 == 0:
-        count_down(LONG_BREAK_MIN * 60)
+        count_down(LONG_BREAK_MIN * 1)
+        timer_label.config(text="Break", fg=PINK)
+        reset()
+
     elif reps % 2 == 0:
-        count_down(SHORT_BREAK_MIN * 60)
+        count_down(SHORT_BREAK_MIN * 1)
+        timer_label.config(text="Break", fg=RED)
+        round = reps / 2
+        if round == 1:
+            tick_labels.config(text="✔")
+        elif round == 2:
+            tick_labels.config(text="✔✔")
+        elif round == 3:
+            tick_labels.config(text="✔✔✔")
+        elif round == 4:
+            tick_labels.config(text="✔✔✔✔")
+            
     else:
-        count_down(WORK_MIN * 60)
+        count_down(WORK_MIN * 1)
+        timer_label.config(text="Work", fg=YELLOW)
     
 
 
@@ -84,11 +103,11 @@ start_button = Button(text="Start", highlightthickness=0, command=start_timer)
 start_button.grid(row=2, column=0)
 
 # Reset button
-reset_button = Button(text="Reset", highlightthickness=0)
+reset_button = Button(text="Reset", highlightthickness=0, command=reset)
 reset_button.grid(row=2, column=2)
 
 # Tick mark label
-tick_labels = Label(text="✔", font=(FONT_NAME, 15, "normal"), bg=GREEN, fg=YELLOW)
+tick_labels = Label(font=(FONT_NAME, 15, "normal"), bg=GREEN, fg=YELLOW)
 tick_labels.grid(row=3, column=1)
 
 
