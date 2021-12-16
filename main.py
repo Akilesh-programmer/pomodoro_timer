@@ -9,44 +9,40 @@ FONT_NAME = "Courier"
 WORK_MIN = 25
 SHORT_BREAK_MIN = 5
 LONG_BREAK_MIN = 20
+timer = None
 reps = 0
 # ---------------------------- TIMER RESET ------------------------------- # 
-def reset():
+
+def reset_timer():
     global reps
-    reps = 0
+    # Stopping the running timer.
+    window.after_cancel(timer)
+    canvas.itemconfig(timer_text, text="00:00")
+    timer_label.config(text="Timer")
     tick_labels.config(text="")
-    start_timer()
+    reps = 0
+
+
 # ---------------------------- TIMER MECHANISM ------------------------------- # 
 def start_timer():
     global reps
     reps += 1
     if reps % 8 == 0:
-        count_down(LONG_BREAK_MIN * 1)
+        count_down(LONG_BREAK_MIN * 60)
         timer_label.config(text="Break", fg=PINK)
-        reset()
-
     elif reps % 2 == 0:
-        count_down(SHORT_BREAK_MIN * 1)
-        timer_label.config(text="Break", fg=RED)
-        round = reps / 2
-        if round == 1:
-            tick_labels.config(text="✔")
-        elif round == 2:
-            tick_labels.config(text="✔✔")
-        elif round == 3:
-            tick_labels.config(text="✔✔✔")
-        elif round == 4:
-            tick_labels.config(text="✔✔✔✔")
-            
+        count_down(SHORT_BREAK_MIN * 60)
+        timer_label.config(text="Break", fg=RED)  
     else:
-        count_down(WORK_MIN * 1)
+        count_down(WORK_MIN * 60)
         timer_label.config(text="Work", fg=YELLOW)
     
 
 
 # ---------------------------- COUNTDOWN MECHANISM ------------------------------- # 
 def count_down(count):
-    
+
+    global timer
     count_min = math.floor(count / 60)
     count_sec = count % 60
     if count_sec == 0:
@@ -75,7 +71,15 @@ def count_down(count):
 
     if count > 0:
         # Here we are delaying the process by 1 second. Here it is mentioned as 1000, because it is milliseconds value. Then we are again calling the function to repeat counting down. Finally whatever we give as 3rd or subsequent input, it will be a input for the count_down function.
-        window.after(1000, count_down, count - 1)
+        timer = window.after(1000, count_down, count - 1)
+    else:
+        start_timer()
+        marks = ""
+        work_sessions = math.floor(reps / 2)
+        for _ in range(0, work_sessions):
+            marks += "✔"
+        tick_labels.config(text=marks)
+
 
 # ---------------------------- UI SETUP ------------------------------- #
 
@@ -103,7 +107,7 @@ start_button = Button(text="Start", highlightthickness=0, command=start_timer)
 start_button.grid(row=2, column=0)
 
 # Reset button
-reset_button = Button(text="Reset", highlightthickness=0, command=reset)
+reset_button = Button(text="Reset", highlightthickness=0, command=reset_timer)
 reset_button.grid(row=2, column=2)
 
 # Tick mark label
